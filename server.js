@@ -15,14 +15,19 @@ const db = mysql.createConnection(
   console.log(`Connected to the books_db database.`)
 );
 
-// Query database
-db.query('SELECT * FROM favorite_books', function (err, results) {
-  console.log(results);
+// Query database example sanitized
+let deletedRow = 2;
+
+db.query(`DELETE FROM favorite_books WHERE id = ?`, deletedRow, (err, result) => {
+  if (err) {
+    console.log(err);
+  }
+  console.log(result);
 });
 
 //Function to initialize app (wil bacome necessary as code becomes more complex/I want to re-initilize at any moment)
 function init() {
-  console.log('Hi, welcome to SVG Logo Generator');
+  console.log('Working!');
   inquirer.prompt(questions).then((answers) => {
 
 });
