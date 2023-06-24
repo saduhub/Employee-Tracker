@@ -12,7 +12,8 @@ const db = mysql.createConnection(
     user: process.env.MYSQL_USERNAME,
     // MySQL password
     password: process.env.DB_PASSWORD,
-    // Cannect to specific database
+    // Connect to specific database
+    database: 'company_db'
   },
   console.log(`Connected to MySQL`)
 );
@@ -54,7 +55,17 @@ const asciiArtText = figlet.textSync('Employee Tracker', {
 function init() {
   console.log(asciiArtText);
   inquirer.prompt(questions).then((answers) => {
-    console.log(answers);
+    if (answers.choice === 'view all departments') {
+      const sql = 'SELECT * FROM department';
+      db.query(sql, (err, result) => {
+          if (err) {
+            console.log('Error:', err.message);
+            return;
+          }
+          console.log('Department Tables:');
+          console.log(result);
+        });
+    }
 });
 }
 // // Function call to initialize app
