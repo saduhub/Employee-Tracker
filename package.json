@@ -1,11 +1,12 @@
 {
   "dependencies": {
     "dotenv": "^16.3.1",
+    "figlet": "^1.6.0",
     "inquirer": "^8.2.4",
     "mysql2": "^3.4.0"
   },
   "devDependencies": {
-    "jest": "^29.5.0"
+    "jest": "^25.0.0"
   },
   "scripts": {
     "start": "node server.js",

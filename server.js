@@ -3,6 +3,7 @@ require('dotenv').config();
 // Packages needed for this application
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const figlet = require('figlet');
 // connect to database
 const db = mysql.createConnection(
   {
@@ -44,10 +45,14 @@ const questions = [
 //   }
 //   console.log(result);
 // });
+// ASCII art text for "Employee Tracker"
+const asciiArtText = figlet.textSync('Employee Tracker', {
+  font: 'Standard', // Specify the font style
+});
 
 // Function to initialize app (wil bacome necessary as code becomes more complex/I want to re-initilize at any moment)
 function init() {
-  console.log('Working!');
+  console.log(asciiArtText);
   inquirer.prompt(questions).then((answers) => {
     console.log(answers);
 });
