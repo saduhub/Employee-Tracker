@@ -19,5 +19,7 @@ VALUES ("Name1", "LName1", 1, NULL),
        ("Name4", "LName4", 4, NULL),
        ("Name5", "LName5", 5, NULL);
        
-       
+SELECT * FROM department;
+SELECT * FROM role;
+SELECT * FROM employee;       
        
