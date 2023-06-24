@@ -1,6 +1,6 @@
+// Import environment variables.
 require('dotenv').config();
 // Packages needed for this application
-const fs = require('fs');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 // connect to database
@@ -11,9 +11,29 @@ const db = mysql.createConnection(
     user: process.env.MYSQL_USERNAME,
     // MySQL password
     password: process.env.DB_PASSWORD,
+    // Cannect to specific database
   },
   console.log(`Connected to MySQL`)
 );
+
+// Questions to be used by inquirer
+const questions = [
+  {
+    type: 'list',
+    name: 'choice',
+    message: 'What would you like to do?',
+    choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee','update an employee role']
+    // filter(val) {
+    // return val;
+    // },
+  },
+  // {
+  //   type: 'input',
+  //   name: 'text',
+  //   message: 'Please enter logo text',
+  //   // validate: validateText,
+  // }
+];
 
 // Query database example sanitized
 // let deletedRow = 2;
@@ -25,12 +45,12 @@ const db = mysql.createConnection(
 //   console.log(result);
 // });
 
-//Function to initialize app (wil bacome necessary as code becomes more complex/I want to re-initilize at any moment)
-// function init() {
-//   console.log('Working!');
-//   inquirer.prompt(questions).then((answers) => {
-
-// });
-// }
+// Function to initialize app (wil bacome necessary as code becomes more complex/I want to re-initilize at any moment)
+function init() {
+  console.log('Working!');
+  inquirer.prompt(questions).then((answers) => {
+    console.log(answers);
+});
+}
 // // Function call to initialize app
-// init();
+init();
