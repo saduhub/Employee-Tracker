@@ -4,6 +4,7 @@ require('dotenv').config();
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const figlet = require('figlet');
+const { printTable } = require('console-table-printer');
 // connect to database
 const db = mysql.createConnection(
   {
@@ -62,8 +63,8 @@ function init() {
             console.log('Error:', err.message);
             return;
           }
-          console.log('Department Tables:');
-          console.log(result);
+          printTable(result);
+          init();
         });
     }
 });
