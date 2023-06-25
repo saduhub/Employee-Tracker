@@ -104,6 +104,37 @@ function init() {
           });
         });
         break;
+      case 'add a role':
+        const roleQuestion = [
+          {
+            type: 'input',
+            name: 'roleName',
+            message: 'Please enter role name',
+          },
+          {
+            type: 'input',
+            name: 'roleSalary',
+            message: 'Please enter role Salary',
+          },
+          {
+            type: 'input',
+            name: 'roleDepartmentId',
+            message: 'Please enter role department id',
+          },
+        ];
+        inquirer.prompt(roleQuestion).then((roleAnswer) => {
+          const addRole = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
+          const newRole = [roleAnswer.roleName, roleAnswer.roleSalary, roleAnswer.roleDepartmentId];
+          db.query(addRole, newRole, (err, result) => {
+            if (err) {
+              console.log('Error:', err.message);
+              return;
+            }
+            console.log('Role successfully added');
+            init();
+          });
+        });
+        break;
       // Add cases for other choices
       default:
         console.log('Invalid choice. Please select a valid option.');
