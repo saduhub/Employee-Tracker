@@ -38,15 +38,6 @@ const questions = [
   // }
 ];
 
-// Query database example sanitized
-// let deletedRow = 2;
-
-// db.query(`DELETE FROM favorite_books WHERE id = ?`, deletedRow, (err, result) => {
-//   if (err) {
-//     console.log(err);
-//   }
-//   console.log(result);
-// });
 // ASCII art text for "Employee Tracker"
 const asciiArtText = figlet.textSync('Employee Tracker', {
   font: 'Standard', // Specify the font style
@@ -79,7 +70,8 @@ function init() {
         });
         break;
       case 'view all employees':
-        const employeesQuery = 'SELECT * FROM employee';
+        // Make .sql file to accomodate Query? For now, below is more concise way of writting SELECT id, name AS 'Employee ID' FROM employee...
+        const employeesQuery = `SELECT e.id AS 'Employee ID', e.first_name AS 'First Name', e.last_name AS 'Last Name', r.title AS 'Job Title', d.name AS 'Department', r.salary AS 'Salary', m.last_name AS 'Manager' FROM employee e JOIN role r ON e.role_id = r.id JOIN department d ON e.department_id = d.id LEFT JOIN employee m ON e.manager_id = m.id`;
         db.query(employeesQuery, (err, result) => {
           if (err) {
             console.log('Error:', err.message);
@@ -87,6 +79,29 @@ function init() {
           }
           printTable(result);
           init();
+        });
+        break;
+      case 'add a department':
+        const departmentQuestion = [
+          {
+            type: 'input',
+            name: 'departmentName',
+            message: 'Please enter department name',
+            // validate: validateText,
+          }
+        ];
+        inquirer.prompt(departmentQuestion).then((departmentAnswer) => {
+          const addDepartment = `INSERT INTO department (name) VALUES (?)`;
+          // Extract the movie name from the request body to add in lace of the (?)
+          const newDepartment = [departmentAnswer.departmentName];
+          db.query(addDepartment, newDepartment, (err, result) => {
+            if (err) {
+              console.log('Error:', err.message);
+              return;
+            }
+            console.log('Department successfully added')
+            init();
+          });
         });
         break;
       // Add cases for other choices

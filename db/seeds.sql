@@ -1,24 +1,37 @@
+-- Insert department names
 INSERT INTO department (name)
-VALUES ("Dep1"),
-       ("Dep2"),
-       ("Dep3"),
-       ("Dep4"),
-       ("Dep5");
+VALUES ('Human Resources'),
+       ('Accounting'),
+       ('Marketing'),
+       ('Sales'),
+       ('IT');
 
+-- Insert manager names
+-- INSERT INTO manager (name)
+-- VALUES ('Daniel Ortiz'),
+--        ('Jennifer Johnson'),
+--        ('Michael Brown'),
+--        ('Emily Williams'),
+--        ('Ron Stuart');
+
+-- Insert roles with titles, salaries, and department IDs
 INSERT INTO role (title, salary, department_id)
-VALUES ("Title1", 1234.00, 1),
-       ("Title2", 1234.00, 2),
-       ("Title3", 1234.00, 3),
-       ("Title4", 1234.00, 4),
-       ("Title5", 1234.00, 5);
+VALUES ('Manager', 80000.00, 1),
+       ('Analyst', 60000.00, 5),
+       ('Marketing Specialist', 55000.00, 3),
+       ('Sales Representative', 50000.00, 4),
+       ('IT Technician', 45000.00, 5);
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Name1", "LName1", 1, NULL),
-       ("Name2", "LName2", 2, NULL),
-       ("Name3", "LName3", 3, NULL),
-       ("Name4", "LName4", 4, NULL),
-       ("Name5", "LName5", 5, NULL);
+-- Insert employee names (First and Last), role IDs, department IDs, and manager IDs (NULL until manager schema and seeding finished)
+INSERT INTO employee (first_name, last_name, role_id, department_id, manager_id)
+VALUES ('John', 'Doe', 2, 5, NULL),
+       ('Jane', 'Smith', 2, 5, NULL),
+       ('Michael', 'Johnson', 5, 5, NULL),
+       ('Emily', 'Williams', 1, 4, NULL),
+       ('Ron', 'Stuart', 1, 1, NULL),
+       ('David', 'Brown', 3, 4, NULL);
        
+-- Show the tables made
 SELECT * FROM department;
 SELECT * FROM role;
 SELECT * FROM employee;       
