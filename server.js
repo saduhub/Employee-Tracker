@@ -54,11 +54,11 @@ const asciiArtText = figlet.textSync('Employee Tracker', {
 
 // Function to initialize app (wil bacome necessary as code becomes more complex/I want to re-initilize at any moment)
 function init() {
-  console.log(asciiArtText);
   inquirer.prompt(questions).then((answers) => {
-    if (answers.choice === 'view all departments') {
-      const sql = 'SELECT * FROM department';
-      db.query(sql, (err, result) => {
+    switch (answers.choice) {
+      case 'view all departments':
+        const departmentQuery = 'SELECT * FROM department';
+        db.query(departmentQuery, (err, result) => {
           if (err) {
             console.log('Error:', err.message);
             return;
@@ -66,8 +66,37 @@ function init() {
           printTable(result);
           init();
         });
+        break;
+      case 'view all roles':
+        const rolesQuery = 'SELECT * FROM role';
+        db.query(rolesQuery, (err, result) => {
+          if (err) {
+            console.log('Error:', err.message);
+            return;
+          }
+          printTable(result);
+          init();
+        });
+        break;
+      case 'view all employees':
+        const employeesQuery = 'SELECT * FROM employee';
+        db.query(employeesQuery, (err, result) => {
+          if (err) {
+            console.log('Error:', err.message);
+            return;
+          }
+          printTable(result);
+          init();
+        });
+        break;
+      // Add cases for other choices
+      default:
+        console.log('Invalid choice. Please select a valid option.');
+        init();
+        break;
     }
-});
+  });
 }
-// // Function call to initialize app
+console.log(asciiArtText);
+// Function call to initialize app
 init();
