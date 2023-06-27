@@ -135,6 +135,54 @@ function init() {
           });
         });
         break;
+      case 'add an employee':
+        const employeeQuestion = [
+          {
+            type: 'input',
+            name: 'employeeFirstName',
+            message: 'Please enter employee first name',
+          },
+          {
+            type: 'input',
+            name: 'employeeLastName',
+            message: 'Please enter employee last name',
+          },
+          {
+            type: 'input',
+            name: 'employeeDepartmentId',
+            message: 'Please enter employee department id',
+          },
+          {
+            type: 'input',
+            name: 'employeeRole',
+            message: 'Please enter employee role id',
+          },
+          // {
+          //   type: 'input',
+          //   name: 'employeeManager',
+          //   message: 'Please enter employee Manager - None for now',
+          //   default: 'None',
+          // }
+        ];
+        inquirer.prompt(employeeQuestion).then((employeeAnswer) => {
+          const addEmployee = `INSERT INTO employee (first_name, last_name, role_id, department_id) VALUES (?, ?, ?, ?)`;
+          const newEmployee = [
+            employeeAnswer.employeeFirstName,
+            employeeAnswer.employeeLastName,
+            employeeAnswer.employeeRole,
+            employeeAnswer.employeeDepartmentId
+            // employeeAnswer.employeeManager
+          ];
+          db.query(addEmployee, newEmployee, (err, result) => {
+            if (err) {
+              console.log('Error:', err.message);
+              return;
+            }
+            console.log('Employee successfully added');
+            init();
+          });
+        });
+        break;
       // Add cases for other choices
       default:
         console.log('Invalid choice. Please select a valid option.');
