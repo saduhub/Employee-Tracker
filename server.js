@@ -183,6 +183,37 @@ function init() {
           });
         });
         break;
+      case 'update an employee role':
+        const updateRoleQuestion = [
+          {
+            type: 'input',
+            name: 'employeeId',
+            message: 'Please enter the ID of the employee you want to update',
+          },
+          {
+            type: 'input',
+            name: 'newRoleId',
+            message: 'Please enter the ID of the new role',
+          },
+          {
+            type: 'input',
+            name: 'newDepartmentId',
+            message: 'Please enter the ID of the new department',
+          },
+        ];
+        inquirer.prompt(updateRoleQuestion).then((updateAnswer) => {
+          const updateEmployeeRole = `UPDATE employee SET role_id = ?, department_id = ? WHERE id = ?`;
+          const roleUpdates = [updateAnswer.newRoleId, updateAnswer.newDepartmentId, updateAnswer.employeeId];
+          db.query(updateEmployeeRole, roleUpdates, (err, result) => {
+            if (err) {
+              console.log('Error:', err.message);
+              return;
+            }
+            console.log('Employee role successfully updated');
+            init();
+          });
+        });
+        break;
       // Add cases for other choices
       default:
         console.log('Invalid choice. Please select a valid option.');
