@@ -206,38 +206,57 @@ function init() {
         });
         break;
       case 'update an employee role':
-        const updateRoleQuestion = [
-          {
-            type: 'input',
-            name: 'employeeId',
-            message: 'Please enter the ID of the employee you want to update',
-          },
-          {
-            type: 'input',
-            name: 'newRoleId',
-            message: 'Please enter the ID of the new role',
-          },
-          {
-            type: 'input',
-            name: 'newDepartmentId',
-            message: 'Please enter the ID of the new department',
-          },
-          {
-            type: 'input',
-            name: 'newManagerId',
-            message: 'Please enter the ID of the new manager',
-          },
-        ];
-        inquirer.prompt(updateRoleQuestion).then((updateAnswer) => {
-          const updateEmployeeRole = `UPDATE employee SET role_id = ?, department_id = ?, manager_id = ? WHERE id = ?`;
-          const roleUpdates = [updateAnswer.newRoleId, updateAnswer.newDepartmentId, updateAnswer.newManagerId, updateAnswer.employeeId];
-          db.query(updateEmployeeRole, roleUpdates, (err, result) => {
+        // Retrieve available names from the database
+        const getNames = 'SELECT id, first_name FROM employee';
+        db.query(getNames, (err, names) => {
+          if (err) {
+            console.log('Error:', err.message);
+            return;
+          }
+          // Map the names to an array of choices for inquirer
+          const nameChoices = names.map((name) => ({
+            name: name.first_name,
+            value: name.id
+          }));
+          // Retrieve available roles from the database
+          const getRoles = 'SELECT id, title FROM role';
+          db.query(getRoles, (err, roles) => {
             if (err) {
               console.log('Error:', err.message);
               return;
             }
-            console.log('Employee role successfully updated');
-            init();
+            // Map the roles to an array of choices for inquirer
+            const roleChoices = roles.map((role) => ({
+              name: role.title,
+              value: role.id
+            }));
+            const updateRoleQuestion = [
+              {
+                type: 'list',
+                name: 'employeeId',
+                message: 'Please select the employee whose role you want to update',
+                choices: nameChoices,
+              },
+              {
+                type: 'list',
+                name: 'newRoleId',
+                message: 'Which role would yu like to assign?',
+                choices: roleChoices,
+              },
+            ];
+
+            inquirer.prompt(updateRoleQuestion).then((updateAnswer) => {
+              const updateEmployeeRole = `UPDATE employee SET role_id = ? WHERE id = ?`;
+              const roleUpdates = [updateAnswer.newRoleId, updateAnswer.employeeId];
+              db.query(updateEmployeeRole, roleUpdates, (err, result) => {
+                if (err) {
+                  console.log('Error:', err.message);
+                  return;
+                }
+                console.log('Employee role successfully updated');
+                init();
+              });
+            });
           });
         });
         break;
