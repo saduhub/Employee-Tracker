@@ -8,6 +8,11 @@ CREATE TABLE department (
   name VARCHAR(30) NOT NULL
 );
 
+CREATE TABLE manager (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(30) NOT NULL
+);
+
 CREATE TABLE role (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(30) NOT NULL,
@@ -16,7 +21,6 @@ CREATE TABLE role (
   FOREIGN KEY (department_id)
     REFERENCES department(id)
     ON DELETE SET NULL
-    ON UPDATE CASCADE
 );
 
 CREATE TABLE employee (
@@ -30,9 +34,8 @@ CREATE TABLE employee (
     REFERENCES role(id),
   FOREIGN KEY (department_id)
     REFERENCES department(id),
-    -- ON UPDATE CASCADE,
   FOREIGN KEY (manager_id)
-    REFERENCES employee(id)
+    REFERENCES manager(id)
 );
 
 SHOW TABLES;

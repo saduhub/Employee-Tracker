@@ -26,16 +26,7 @@ const questions = [
     name: 'choice',
     message: 'What would you like to do?',
     choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee','update an employee role']
-    // filter(val) {
-    // return val;
-    // },
   },
-  // {
-  //   type: 'input',
-  //   name: 'text',
-  //   message: 'Please enter logo text',
-  //   // validate: validateText,
-  // }
 ];
 
 // ASCII art text for "Employee Tracker"
@@ -59,7 +50,7 @@ function init() {
         });
         break;
       case 'view all roles':
-        const rolesQuery = 'SELECT * FROM role';
+        const rolesQuery = `SELECT r.id AS 'Role ID', r.title AS 'Job Title', r.salary AS 'Salary', d.name AS 'Department Name' FROM role r JOIN department d ON r.department_id = d.id;`;
         db.query(rolesQuery, (err, result) => {
           if (err) {
             console.log('Error:', err.message);
@@ -71,7 +62,7 @@ function init() {
         break;
       case 'view all employees':
         // Make .sql file to accomodate Query? For now, below is more concise way of writting SELECT id, name AS 'Employee ID' FROM employee...
-        const employeesQuery = `SELECT e.id AS 'Employee ID', e.first_name AS 'First Name', e.last_name AS 'Last Name', r.title AS 'Job Title', d.name AS 'Department', r.salary AS 'Salary', m.last_name AS 'Manager' FROM employee e JOIN role r ON e.role_id = r.id JOIN department d ON e.department_id = d.id LEFT JOIN employee m ON e.manager_id = m.id`;
+        const employeesQuery = `SELECT e.id AS 'Employee ID', e.first_name AS 'First Name', e.last_name AS 'Last Name', r.title AS 'Job Title', d.name AS 'Department', r.salary AS 'Salary', m.name AS 'Manager' FROM employee e JOIN role r ON e.role_id = r.id JOIN department d ON e.department_id = d.id LEFT JOIN manager m ON e.manager_id = m.id`;
         db.query(employeesQuery, (err, result) => {
           if (err) {
             console.log('Error:', err.message);
@@ -136,50 +127,81 @@ function init() {
         });
         break;
       case 'add an employee':
-        const employeeQuestion = [
-          {
-            type: 'input',
-            name: 'employeeFirstName',
-            message: 'Please enter employee first name',
-          },
-          {
-            type: 'input',
-            name: 'employeeLastName',
-            message: 'Please enter employee last name',
-          },
-          {
-            type: 'input',
-            name: 'employeeDepartmentId',
-            message: 'Please enter employee department id',
-          },
-          {
-            type: 'input',
-            name: 'employeeRole',
-            message: 'Please enter employee role id',
-          },
-          // {
-          //   type: 'input',
-          //   name: 'employeeManager',
-          //   message: 'Please enter employee Manager - None for now',
-          //   default: 'None',
-          // }
-        ];
-        inquirer.prompt(employeeQuestion).then((employeeAnswer) => {
-          const addEmployee = `INSERT INTO employee (first_name, last_name, role_id, department_id) VALUES (?, ?, ?, ?)`;
-          const newEmployee = [
-            employeeAnswer.employeeFirstName,
-            employeeAnswer.employeeLastName,
-            employeeAnswer.employeeRole,
-            employeeAnswer.employeeDepartmentId
-            // employeeAnswer.employeeManager
-          ];
-          db.query(addEmployee, newEmployee, (err, result) => {
+        // Retrieve available roles from the database
+        const getRoles = 'SELECT id, title FROM role';
+        db.query(getRoles, (err, roles) => {
+          if (err) {
+            console.log('Error:', err.message);
+            return;
+          }
+          // Map the roles to an array of choices for inquirer
+          const roleChoices = roles.map((role) => ({
+            name: role.title,
+            value: role.id
+          }));
+          // Retrieve available managers from the database
+          const getManagers = 'SELECT id, name FROM manager';
+          db.query(getManagers, (err, managers) => {
             if (err) {
               console.log('Error:', err.message);
               return;
             }
-            console.log('Employee successfully added');
-            init();
+            // Map the managers to an array of choices for inquirer
+            const managerChoices = managers.map((manager) => ({
+              name: manager.name,
+              value: manager.id
+            }));
+            const employeeQuestion = [
+              {
+                type: 'input',
+                name: 'employeeFirstName',
+                message: 'Please enter employee first name',
+              },
+              {
+                type: 'input',
+                name: 'employeeLastName',
+                message: 'Please enter employee last name',
+              },
+              {
+                type: 'list',
+                name: 'employeeRole',
+                message: 'Please select employee role',
+                choices: roleChoices,
+              },
+              {
+                type: 'list',
+                name: 'employeeManager',
+                message: 'Please select employee manager',
+                choices: managerChoices,
+              }
+            ];
+
+            inquirer.prompt(employeeQuestion).then((employeeAnswer) => {
+              const roleQuery = 'SELECT department_id FROM role WHERE id = ?';
+              db.query(roleQuery, employeeAnswer.employeeRole, (err, result) => {
+                if (err) {
+                  console.log('Error:', err.message);
+                  return;
+                }
+                const departmentId = result[0].department_id;
+                const addEmployee = `INSERT INTO employee (first_name, last_name, role_id, department_id, manager_id) VALUES (?, ?, ?, ?, ?)`;
+                const newEmployee = [
+                  employeeAnswer.employeeFirstName,
+                  employeeAnswer.employeeLastName,
+                  employeeAnswer.employeeRole,
+                  departmentId,
+                  employeeAnswer.employeeManager
+                ];
+                db.query(addEmployee, newEmployee, (err, result) => {
+                  if (err) {
+                    console.log('Error:', err.message);
+                    return;
+                  }
+                  console.log('Employee successfully added');
+                  init();
+                });
+              });
+            });
           });
         });
         break;
@@ -200,10 +222,15 @@ function init() {
             name: 'newDepartmentId',
             message: 'Please enter the ID of the new department',
           },
+          {
+            type: 'input',
+            name: 'newManagerId',
+            message: 'Please enter the ID of the new manager',
+          },
         ];
         inquirer.prompt(updateRoleQuestion).then((updateAnswer) => {
-          const updateEmployeeRole = `UPDATE employee SET role_id = ?, department_id = ? WHERE id = ?`;
-          const roleUpdates = [updateAnswer.newRoleId, updateAnswer.newDepartmentId, updateAnswer.employeeId];
+          const updateEmployeeRole = `UPDATE employee SET role_id = ?, department_id = ?, manager_id = ? WHERE id = ?`;
+          const roleUpdates = [updateAnswer.newRoleId, updateAnswer.newDepartmentId, updateAnswer.newManagerId, updateAnswer.employeeId];
           db.query(updateEmployeeRole, roleUpdates, (err, result) => {
             if (err) {
               console.log('Error:', err.message);
